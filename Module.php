@@ -7,6 +7,8 @@ namespace OldTown\Workflow\ZF2\View;
 
 
 use OldTown\Workflow\ZF2\Service\Workflow;
+use Zend\ModuleManager\ModuleManager;
+use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\EventManager\EventInterface;
@@ -14,6 +16,11 @@ use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use OldTown\Workflow\ZF2\View\Listener\RenderWorkflowResult;
+use Zend\ModuleManager\Feature\InitProviderInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ModuleManager\Listener\ServiceListenerInterface;
+use OldTown\Workflow\ZF2\View\Handler\Manager;
+use OldTown\Workflow\ZF2\View\Handler\EventBusMessageProviderInterface;
 
 
 /**
@@ -24,7 +31,8 @@ use OldTown\Workflow\ZF2\View\Listener\RenderWorkflowResult;
 class Module implements
     BootstrapListenerInterface,
     ConfigProviderInterface,
-    AutoloaderProviderInterface
+    AutoloaderProviderInterface,
+    InitProviderInterface
 {
 
     /**
@@ -78,6 +86,32 @@ class Module implements
     }
 
 
+    /**
+     *
+     * @param ModuleManagerInterface $manager
+     * @throws \Zend\ServiceManager\Exception\ServiceNotFoundException
+     * @throws \OldTown\Workflow\ZF2\View\Exception\ErrorInitModuleException
+     */
+    public function init(ModuleManagerInterface $manager)
+    {
+        if (!$manager instanceof ModuleManager) {
+            $errMsg =sprintf('Module manager not implement %s', ModuleManager::class);
+            throw new Exception\ErrorInitModuleException($errMsg);
+        }
+        /** @var ModuleManager $manager */
+
+        /** @var ServiceLocatorInterface $sm */
+        $sm = $manager->getEvent()->getParam('ServiceManager');
+
+        /** @var ServiceListenerInterface $serviceListener */
+        $serviceListener = $sm->get('ServiceListener');
+        $serviceListener->addServiceManager(
+            Manager::class,
+            'workflow_zf2_view_handler',
+            EventBusMessageProviderInterface::class,
+            'getWorkflowViewHandlerConfig'
+        );
+    }
 
 
 

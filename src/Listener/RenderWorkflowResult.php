@@ -9,6 +9,8 @@ use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
 use OldTown\Workflow\ZF2\Event\WorkflowEvent;
 use OldTown\Workflow\ZF2\View\Options\ModuleOptions;
+use OldTown\Workflow\ZF2\View\Handler\Manager as HandlerManager;
+
 
 /**
  * Class RenderWorkflowResult
@@ -21,11 +23,19 @@ class RenderWorkflowResult extends AbstractListenerAggregate
      * @var string
      */
     const MODULE_OPTIONS = 'moduleOptions';
-
+    /**
+     * @var string
+     */
+    const HANDLER_MANAGER = 'handlerManager';
     /**
      * @var ModuleOptions
      */
     protected $moduleOptions;
+
+    /**
+     * @var HandlerManager
+     */
+    protected $handlerManager;
 
     /**
      * @param array $options
@@ -49,6 +59,12 @@ class RenderWorkflowResult extends AbstractListenerAggregate
             throw new Exception\InvalidArgumentException($errMsg);
         }
         $this->setModuleOptions($options[static::MODULE_OPTIONS]);
+
+        if (!array_key_exists(static::HANDLER_MANAGER, $options)) {
+            $errMsg = sprintf('option %s not found', static::HANDLER_MANAGER);
+            throw new Exception\InvalidArgumentException($errMsg);
+        }
+        $this->setHandlerManager($options[static::HANDLER_MANAGER]);
     }
 
     /**
@@ -66,6 +82,11 @@ class RenderWorkflowResult extends AbstractListenerAggregate
      *
      * @throws \OldTown\Workflow\ZF2\View\Options\Exception\InvalidViewNameException
      * @throws \OldTown\Workflow\ZF2\View\Listener\Exception\InvalidViewNameException
+     * @throws \Zend\ServiceManager\Exception\ServiceNotFoundException
+     * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
+     * @throws \Zend\ServiceManager\Exception\RuntimeException
+     *
+     * @return mixed
      */
     public function renderWorkflowResult(WorkflowEvent $event)
     {
@@ -76,8 +97,16 @@ class RenderWorkflowResult extends AbstractListenerAggregate
         }
         $viewOptions = $this->getModuleOptions()->getViewOptions($viewName);
 
+        $handlerName = $viewOptions->getHandler();
+        if (null === $handlerName) {
+            $handlerName = HandlerManager::DEFAULT_HANDLER;
+        }
 
-        return;
+        $handler = $this->getHandlerManager()->get($handlerName);
+
+        $viewData = $handler->dispatch();
+
+        return $viewData;
     }
 
     /**
@@ -99,6 +128,27 @@ class RenderWorkflowResult extends AbstractListenerAggregate
 
         return $this;
     }
+
+    /**
+     * @return HandlerManager
+     */
+    public function getHandlerManager()
+    {
+        return $this->handlerManager;
+    }
+
+    /**
+     * @param HandlerManager $handlerManager
+     *
+     * @return $this
+     */
+    public function setHandlerManager(HandlerManager $handlerManager)
+    {
+        $this->handlerManager = $handlerManager;
+
+        return $this;
+    }
+
 
 
 }

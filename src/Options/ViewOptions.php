@@ -22,7 +22,7 @@ class ViewOptions extends AbstractOptions
     /**
      * @var string
      */
-    protected $listener;
+    protected $handler;
 
     /**
      * @return string
@@ -47,19 +47,19 @@ class ViewOptions extends AbstractOptions
     /**
      * @return string
      */
-    public function getListener()
+    public function getHandler()
     {
-        return $this->listener;
+        return $this->handler;
     }
 
     /**
-     * @param string $listener
+     * @param string $handler
      *
      * @return $this
      */
-    public function setListener($listener)
+    public function setHandler($handler)
     {
-        $this->listener = $listener;
+        $this->handler = $handler;
 
         return $this;
     }

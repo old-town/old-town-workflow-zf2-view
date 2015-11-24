@@ -10,7 +10,7 @@ return [
                 //Ключ по которому будет получаться шаблон у соответствующего рендерера
                 'template' => 'application/test-zf2-view/test-view',
                 //Обработчик в котором реализована логика отображения результатов workflow
-                'listener' => TestViewHandler::class
+                'handler' => TestViewHandler::class
             ]
         ]
     ]
