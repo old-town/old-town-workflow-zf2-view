@@ -7,6 +7,7 @@ namespace OldTown\Workflow\ZF2\View\Listener;
 
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use OldTown\Workflow\ZF2\View\Options\ModuleOptions;
 
 /**
  * Class RenderWorkflowResultFactory
@@ -19,10 +20,18 @@ class RenderWorkflowResultFactory implements  FactoryInterface
      * @param ServiceLocatorInterface $serviceLocator
      *
      * @return RenderWorkflowResult
+     *
+     * @throws \Zend\ServiceManager\Exception\ServiceNotFoundException
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $service = new RenderWorkflowResult();
+        $moduleOptions = $serviceLocator->get(ModuleOptions::class);
+
+        $options = [
+            'moduleOptions' => $moduleOptions
+        ];
+
+        $service = new RenderWorkflowResult($options);
 
         return $service;
     }

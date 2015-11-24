@@ -1,0 +1,17 @@
+<?php
+
+use Application\Listener\TestViewHandler;
+
+return [
+    'workflow_zf2_view' => [
+        'view' => [
+            //Имя вида. Совпадает с значением атрибута view у ActionDescriptor
+            'test' => [
+                //Ключ по которому будет получаться шаблон у соответствующего рендерера
+                'template' => 'application/test-zf2-view/test-view',
+                //Обработчик в котором реализована логика отображения результатов workflow
+                'listener' => TestViewHandler::class
+            ]
+        ]
+    ]
+];

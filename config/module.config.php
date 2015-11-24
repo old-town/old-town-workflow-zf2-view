@@ -20,5 +20,10 @@ return [
         'abstract_factories' => [
 
         ]
+    ],
+    'workflow_zf2_view' => [
+        'view' => [
+
+        ]
     ]
 ];

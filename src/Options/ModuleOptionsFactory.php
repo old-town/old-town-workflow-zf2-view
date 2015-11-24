@@ -7,7 +7,7 @@ namespace OldTown\Workflow\ZF2\View\Options;
 
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use OldTown\Workflow\ZF2\Module;
+use OldTown\Workflow\ZF2\View\Module;
 
 /**
  * Class ModuleOptionsFactory
