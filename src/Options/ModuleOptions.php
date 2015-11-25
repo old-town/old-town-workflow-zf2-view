@@ -66,6 +66,4 @@ class ModuleOptions extends AbstractOptions
 
         return $this->viewOptions[$viewName];
     }
-
-
 }

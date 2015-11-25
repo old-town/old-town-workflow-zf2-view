@@ -23,6 +23,12 @@ abstract class AbstractHandler implements HandlerInterface
     use EventManagerAwareTrait;
 
     /**
+     *
+     * @var string
+     */
+    const CAPTURE_TO_DEFAULT = 'workflowContent';
+
+    /**
      * @var string
      */
     protected $template;
@@ -31,6 +37,16 @@ abstract class AbstractHandler implements HandlerInterface
      * @var MvcEvent
      */
     protected $mvcEvent;
+
+    /**
+     * @var ViewModel
+     */
+    protected $workflowViewModel;
+
+    /**
+     * @var string
+     */
+    protected $captureTo = self::CAPTURE_TO_DEFAULT;
 
     /**
      * @param array|Traversable $options
@@ -51,7 +67,6 @@ abstract class AbstractHandler implements HandlerInterface
      */
     protected function init($options = null)
     {
-
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         } elseif (null === $options) {
@@ -61,15 +76,19 @@ abstract class AbstractHandler implements HandlerInterface
             throw new Exception\InvalidArgumentException($errMsg);
         }
 
-        if (array_key_exists('template', $options)) {
+        if (array_key_exists('template', $options) && null !== $options['template']) {
             $this->setTemplate($options['template']);
         }
 
-        if (!array_key_exists('mvcEvent', $options)) {
+        if (!array_key_exists('mvcEvent', $options) || null === $options['mvcEvent']) {
             $errMsg = 'MvcEvent not found';
             throw new Exception\InvalidArgumentException($errMsg);
         }
         $this->setMvcEvent($options['mvcEvent']);
+
+        if (array_key_exists('captureTo', $options)  && null !== $options['captureTo']) {
+            $this->setCaptureTo($options['captureTo']);
+        }
     }
 
     /**
@@ -90,7 +109,6 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function bootstrap(ContextInterface $context)
     {
-
     }
 
     /**
@@ -102,9 +120,8 @@ abstract class AbstractHandler implements HandlerInterface
     {
         $template = $this->getTemplate();
         if ($template) {
-            $this->getMvcEvent()->getViewModel()->setTemplate($template)->setTerminal(true);
+            $this->getWorkflowViewModel()->setTemplate($template);
         }
-
     }
 
     /**
@@ -116,13 +133,12 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function dispatch(ContextInterface $context)
     {
-
     }
 
     /**
      * @param ContextInterface $context
      *
-     * @return ModelInterface
+     * @return void
      */
     public function run(ContextInterface $context)
     {
@@ -134,12 +150,11 @@ abstract class AbstractHandler implements HandlerInterface
         if (null === $resultDispatch) {
             $resultDispatch = [];
         }
+        $workflowViewMode = $this->getWorkflowViewModel();
+        $this->populateViewModel($resultDispatch, $workflowViewMode);
 
-        $mvcEvent = $this->getMvcEvent();
         $viewModel = $this->getMvcEvent()->getViewModel();
-        $this->populateViewModel($resultDispatch, $viewModel, $mvcEvent);
-
-        return $viewModel;
+        $viewModel->addChild($this->getWorkflowViewModel());
     }
 
     /**
@@ -152,9 +167,8 @@ abstract class AbstractHandler implements HandlerInterface
      *
      * @param  array|ViewModel $result
      * @param  ModelInterface $viewModel
-     * @param  MvcEvent $e
      */
-    protected function populateViewModel($result, ModelInterface $viewModel, MvcEvent $e)
+    protected function populateViewModel($result, ModelInterface $viewModel)
     {
         if ($result instanceof ViewModel) {
             // "Re-cast" content-negotiation view models to the view model type
@@ -172,14 +186,13 @@ abstract class AbstractHandler implements HandlerInterface
                 }
             }
 
-            $e->setResult($viewModel);
+            //$e->setResult($viewModel);
             return;
         }
 
         // At this point, the result is an array; use it to populate the view
         // model variables
         $viewModel->setVariables($result);
-        $e->setResult($viewModel);
     }
 
 
@@ -223,4 +236,50 @@ abstract class AbstractHandler implements HandlerInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getCaptureTo()
+    {
+        return $this->captureTo;
+    }
+
+    /**
+     * @param string $captureTo
+     *
+     * @return $this
+     */
+    public function setCaptureTo($captureTo)
+    {
+        $this->captureTo = $captureTo;
+
+        return $this;
+    }
+
+    /**
+     * @return ViewModel
+     */
+    public function getWorkflowViewModel()
+    {
+        if (null !== $this->workflowViewModel) {
+            return $this->workflowViewModel;
+        }
+        $this->workflowViewModel = new ViewModel();
+        $this->workflowViewModel->setCaptureTo($this->getCaptureTo());
+        $this->workflowViewModel->setAppend(true);
+
+        return $this->workflowViewModel;
+    }
+
+    /**
+     * @param ViewModel $workflowViewModel
+     *
+     * @return $this
+     */
+    public function setWorkflowViewModel(ViewModel $workflowViewModel)
+    {
+        $this->workflowViewModel = $workflowViewModel;
+
+        return $this;
+    }
 }

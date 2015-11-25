@@ -12,7 +12,7 @@ use OldTown\Workflow\ZF2\View\Options\ModuleOptions;
 use OldTown\Workflow\ZF2\View\Handler\Manager as HandlerManager;
 use OldTown\Workflow\ZF2\View\Handler\HandlerAbstractFactory;
 use OldTown\Workflow\ZF2\View\Handler\Context\HandlerContext;
-use Zend\View\Model\ModelInterface;
+
 
 /**
  * Class RenderWorkflowResult
@@ -88,7 +88,6 @@ class RenderWorkflowResult extends AbstractListenerAggregate
      * @throws \Zend\ServiceManager\Exception\ServiceNotCreatedException
      * @throws \Zend\ServiceManager\Exception\RuntimeException
      *
-     * @return ModelInterface
      */
     public function renderWorkflowResult(WorkflowEvent $event)
     {
@@ -106,9 +105,7 @@ class RenderWorkflowResult extends AbstractListenerAggregate
         $context->setTransientVars($event->getTransientVars());
         $context->setWorkflow($event->getWorkflow());
 
-        $viewData = $handler->run($context);
-
-        return $viewData;
+        $handler->run($context);
     }
 
     /**
@@ -150,7 +147,4 @@ class RenderWorkflowResult extends AbstractListenerAggregate
 
         return $this;
     }
-
-
-
 }

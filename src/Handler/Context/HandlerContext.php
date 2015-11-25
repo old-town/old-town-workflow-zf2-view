@@ -65,7 +65,4 @@ class HandlerContext extends Event implements ContextInterface
 
         return $this;
     }
-
-
-
 }

@@ -5,7 +5,6 @@
  */
 namespace OldTown\Workflow\ZF2\View\Handler;
 
-
 use OldTown\Workflow\ZF2\View\Options\ModuleOptions;
 use Zend\Mvc\Application;
 use Zend\ServiceManager\AbstractFactoryInterface;
@@ -20,7 +19,6 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  */
 class HandlerAbstractFactory implements AbstractFactoryInterface
 {
-
     /**
      * @var string
      */
@@ -75,11 +73,11 @@ class HandlerAbstractFactory implements AbstractFactoryInterface
             $mvcEvent = $app->getMvcEvent();
             $handlerOptions = [
                 'template' => $viewOptions->getTemplate(),
-                'mvcEvent' => $mvcEvent
+                'mvcEvent' => $mvcEvent,
+                'captureTo' => $viewOptions->getCaptureTo()
             ];
 
             $handler = $serviceLocator->get($handlerName, $handlerOptions);
-
         } catch (\Exception $e) {
             throw new Exception\FactoryException($e->getMessage(), $e->getCode(), $e);
         }

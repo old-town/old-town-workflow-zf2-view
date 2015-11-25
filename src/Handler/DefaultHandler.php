@@ -12,5 +12,4 @@ namespace OldTown\Workflow\ZF2\View\Handler;
  */
 class DefaultHandler extends AbstractHandler
 {
-
 }

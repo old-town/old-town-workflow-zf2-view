@@ -25,6 +25,11 @@ class ViewOptions extends AbstractOptions
     protected $handler;
 
     /**
+     * @var string
+     */
+    protected $captureTo;
+
+    /**
      * @return string
      */
     public function getTemplate()
@@ -60,6 +65,26 @@ class ViewOptions extends AbstractOptions
     public function setHandler($handler)
     {
         $this->handler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCaptureTo()
+    {
+        return $this->captureTo;
+    }
+
+    /**
+     * @param string $captureTo
+     *
+     * @return $this
+     */
+    public function setCaptureTo($captureTo)
+    {
+        $this->captureTo = $captureTo;
 
         return $this;
     }

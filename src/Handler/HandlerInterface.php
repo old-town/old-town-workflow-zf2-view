@@ -6,7 +6,7 @@
 namespace OldTown\Workflow\ZF2\View\Handler;
 
 use \OldTown\Workflow\ZF2\View\Handler\Context\ContextInterface;
-use Zend\View\Model\ModelInterface;
+
 
 /**
  * Interface HandlerInterface
@@ -18,7 +18,7 @@ interface HandlerInterface
     /**
      * @param ContextInterface $context
      *
-     * @return ModelInterface
+     * @return void
      */
     public function run(ContextInterface $context);
 
