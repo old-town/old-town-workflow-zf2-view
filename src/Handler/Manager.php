@@ -12,7 +12,7 @@ use Zend\ServiceManager\AbstractPluginManager;
  *
  * @package OldTown\Workflow\ZF2\View\Handler
  *
- * @method HandlerInterface get($name)
+ * @method HandlerInterface get($name, $options = array(), $usePeeringServiceManagers = true)
  */
 class Manager extends AbstractPluginManager
 {

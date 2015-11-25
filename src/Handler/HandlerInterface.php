@@ -5,6 +5,8 @@
  */
 namespace OldTown\Workflow\ZF2\View\Handler;
 
+use \OldTown\Workflow\ZF2\View\Handler\Context\ContextInterface;
+
 /**
  * Interface HandlerInterface
  *
@@ -13,7 +15,30 @@ namespace OldTown\Workflow\ZF2\View\Handler;
 interface HandlerInterface
 {
     /**
+     * @param ContextInterface $context
+     *
      * @return mixed
      */
-    public function dispatch();
+    public function run(ContextInterface $context);
+
+    /**
+     * Настройка хендлера
+     *
+     * @param ContextInterface $context
+     */
+    public function bootstrap(ContextInterface $context);
+
+    /**
+     * Установка нового шаблона
+     *
+     * @param ContextInterface $context
+     */
+    public function templateResolve(ContextInterface $context);
+
+    /**
+     * Пред обработка данных
+     *
+     * @param ContextInterface $context
+     */
+    public function dispatch(ContextInterface $context);
 }

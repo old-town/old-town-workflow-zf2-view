@@ -13,7 +13,7 @@ use OldTown\Workflow\ZF2\View\Listener\RenderWorkflowResultFactory;
 use OldTown\Workflow\ZF2\View\Handler\Manager;
 use OldTown\Workflow\ZF2\View\Handler\ManagerFactory;
 use OldTown\Workflow\ZF2\View\Handler\DefaultHandler;
-
+use OldTown\Workflow\ZF2\View\Handler\HandlerAbstractFactory;
 
 return [
     'service_manager'           => [
@@ -31,7 +31,9 @@ return [
         'invokables'         => [
             DefaultHandler::class => DefaultHandler::class
         ],
-        'abstract_factories' => [],
+        'abstract_factories' => [
+            HandlerAbstractFactory::class => HandlerAbstractFactory::class
+        ],
         'aliases'            => [
             'default' => DefaultHandler::class
         ]

@@ -10,7 +10,8 @@ use Zend\EventManager\EventManagerInterface;
 use OldTown\Workflow\ZF2\Event\WorkflowEvent;
 use OldTown\Workflow\ZF2\View\Options\ModuleOptions;
 use OldTown\Workflow\ZF2\View\Handler\Manager as HandlerManager;
-
+use OldTown\Workflow\ZF2\View\Handler\HandlerAbstractFactory;
+use OldTown\Workflow\ZF2\View\Handler\Context\HandlerContext;
 
 /**
  * Class RenderWorkflowResult
@@ -95,16 +96,16 @@ class RenderWorkflowResult extends AbstractListenerAggregate
             $errMsg = 'viewName not found';
             throw new Exception\InvalidViewNameException($errMsg);
         }
-        $viewOptions = $this->getModuleOptions()->getViewOptions($viewName);
 
-        $handlerName = $viewOptions->getHandler();
-        if (null === $handlerName) {
-            $handlerName = HandlerManager::DEFAULT_HANDLER;
-        }
 
-        $handler = $this->getHandlerManager()->get($handlerName);
+        $serviceName = HandlerAbstractFactory::buildServiceName($viewName);
+        $handler = $this->getHandlerManager()->get($serviceName);
 
-        $viewData = $handler->dispatch();
+        $context = new HandlerContext();
+        $context->setTransientVars($event->getTransientVars());
+        $context->setWorkflow($event->getWorkflow());
+
+        $viewData = $handler->run($context);
 
         return $viewData;
     }
