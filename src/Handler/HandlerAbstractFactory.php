@@ -7,6 +7,7 @@ namespace OldTown\Workflow\ZF2\View\Handler;
 
 
 use OldTown\Workflow\ZF2\View\Options\ModuleOptions;
+use Zend\Mvc\Application;
 use Zend\ServiceManager\AbstractFactoryInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -69,8 +70,12 @@ class HandlerAbstractFactory implements AbstractFactoryInterface
                 $handlerName = Manager::DEFAULT_HANDLER;
             }
 
+            /** @var Application $app */
+            $app = $appServiceManager->get('application');
+            $mvcEvent = $app->getMvcEvent();
             $handlerOptions = [
-                'template' => $viewOptions->getTemplate()
+                'template' => $viewOptions->getTemplate(),
+                'mvcEvent' => $mvcEvent
             ];
 
             $handler = $serviceLocator->get($handlerName, $handlerOptions);

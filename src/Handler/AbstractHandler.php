@@ -10,6 +10,8 @@ use Traversable;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Mvc\MvcEvent;
+use Zend\View\Model\ViewModel;
+use Zend\View\Model\ModelInterface;
 
 /**
  * Class AbstractHandler
@@ -63,6 +65,11 @@ abstract class AbstractHandler implements HandlerInterface
             $this->setTemplate($options['template']);
         }
 
+        if (!array_key_exists('mvcEvent', $options)) {
+            $errMsg = 'MvcEvent not found';
+            throw new Exception\InvalidArgumentException($errMsg);
+        }
+        $this->setMvcEvent($options['mvcEvent']);
     }
 
     /**
@@ -94,6 +101,9 @@ abstract class AbstractHandler implements HandlerInterface
     public function templateResolve(ContextInterface $context)
     {
         $template = $this->getTemplate();
+        if ($template) {
+            $this->getMvcEvent()->getViewModel()->setTemplate($template)->setTerminal(true);
+        }
 
     }
 
@@ -101,6 +111,8 @@ abstract class AbstractHandler implements HandlerInterface
      * Пред обработка данных
      *
      * @param ContextInterface $context
+     *
+     * @return mixed
      */
     public function dispatch(ContextInterface $context)
     {
@@ -110,7 +122,7 @@ abstract class AbstractHandler implements HandlerInterface
     /**
      * @param ContextInterface $context
      *
-     * @return mixed
+     * @return ModelInterface
      */
     public function run(ContextInterface $context)
     {
@@ -123,8 +135,53 @@ abstract class AbstractHandler implements HandlerInterface
             $resultDispatch = [];
         }
 
-        return $resultDispatch;
+        $mvcEvent = $this->getMvcEvent();
+        $viewModel = $this->getMvcEvent()->getViewModel();
+        $this->populateViewModel($resultDispatch, $viewModel, $mvcEvent);
+
+        return $viewModel;
     }
+
+    /**
+     * Populate the view model returned by the AcceptableViewModelSelector from the result
+     *
+     * If the result is a ViewModel, we "re-cast" it by copying over all
+     * values/settings/etc from the original.
+     *
+     * If the result is an array, we pass those values as the view model variables.
+     *
+     * @param  array|ViewModel $result
+     * @param  ModelInterface $viewModel
+     * @param  MvcEvent $e
+     */
+    protected function populateViewModel($result, ModelInterface $viewModel, MvcEvent $e)
+    {
+        if ($result instanceof ViewModel) {
+            // "Re-cast" content-negotiation view models to the view model type
+            // selected by the AcceptableViewModelSelector
+
+            $viewModel->setVariables($result->getVariables());
+            $viewModel->setTemplate($result->getTemplate());
+            $viewModel->setOptions($result->getOptions());
+            $viewModel->setCaptureTo($result->captureTo());
+            $viewModel->setTerminal($result->terminate());
+            $viewModel->setAppend($result->isAppend());
+            if ($result->hasChildren()) {
+                foreach ($result->getChildren() as $child) {
+                    $viewModel->addChild($child);
+                }
+            }
+
+            $e->setResult($viewModel);
+            return;
+        }
+
+        // At this point, the result is an array; use it to populate the view
+        // model variables
+        $viewModel->setVariables($result);
+        $e->setResult($viewModel);
+    }
+
 
     /**
      * @return string
@@ -165,4 +222,5 @@ abstract class AbstractHandler implements HandlerInterface
 
         return $this;
     }
+
 }
