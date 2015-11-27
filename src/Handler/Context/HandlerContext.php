@@ -14,7 +14,7 @@ use OldTown\Workflow\Loader\WorkflowDescriptor;
  *
  * @package OldTown\Workflow\ZF2\View\Handler\Context
  */
-class HandlerContext extends Event implements ContextInterface
+class HandlerContext extends Event implements ContextEventInterface
 {
     /**
      * @var TransientVarsInterface

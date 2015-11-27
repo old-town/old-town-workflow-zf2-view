@@ -5,13 +5,16 @@
  */
 namespace OldTown\Workflow\ZF2\View\Handler;
 
+use OldTown\Workflow\ZF2\View\Handler\Context\ContextEventInterface;
 use OldTown\Workflow\ZF2\View\Handler\Context\ContextInterface;
+use OldTown\Workflow\ZF2\View\Handler\Context\HandlerContext;
 use Traversable;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\ModelInterface;
+use Zend\EventManager\EventInterface;
 
 /**
  * Class AbstractHandler
@@ -96,9 +99,9 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function attachDefaultListeners()
     {
-        $this->getEventManager()->attach(ContextInterface::EVENT_BOOTSTRAP, [$this, 'bootstrap'], -100);
-        $this->getEventManager()->attach(ContextInterface::EVENT_TEMPLATE_RESOLVE, [$this, 'templateResolve'], -100);
-        $this->getEventManager()->attach(ContextInterface::EVENT_DISPATCH, [$this, 'dispatch'], -100);
+        $this->getEventManager()->attach(ContextEventInterface::EVENT_BOOTSTRAP, [$this, 'bootstrap'], -100);
+        $this->getEventManager()->attach(ContextEventInterface::EVENT_TEMPLATE_RESOLVE, [$this, 'templateResolve'], -100);
+        $this->getEventManager()->attach(ContextEventInterface::EVENT_DISPATCH, [$this, 'dispatch'], -100);
     }
 
 
@@ -142,9 +145,15 @@ abstract class AbstractHandler implements HandlerInterface
      */
     public function run(ContextInterface $context)
     {
-        $this->getEventManager()->trigger(ContextInterface::EVENT_BOOTSTRAP, $context);
-        $this->getEventManager()->trigger(ContextInterface::EVENT_TEMPLATE_RESOLVE, $context);
-        $resultDispatchHandler = $this->getEventManager()->trigger(ContextInterface::EVENT_DISPATCH, $context);
+        if ($context instanceof EventInterface) {
+            $event = $context;
+        } else {
+            $event = $this->createEventByContext($context);
+        }
+
+        $this->getEventManager()->trigger(ContextEventInterface::EVENT_BOOTSTRAP, $this, $event);
+        $this->getEventManager()->trigger(ContextEventInterface::EVENT_TEMPLATE_RESOLVE, $this, $event);
+        $resultDispatchHandler = $this->getEventManager()->trigger(ContextEventInterface::EVENT_DISPATCH, $this, $event);
         $resultDispatch = $resultDispatchHandler->last();
 
         if (null === $resultDispatch) {
@@ -155,6 +164,21 @@ abstract class AbstractHandler implements HandlerInterface
 
         $viewModel = $this->getMvcEvent()->getViewModel();
         $viewModel->addChild($this->getWorkflowViewModel());
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return ContextEventInterface
+     */
+    protected function createEventByContext(ContextInterface $context)
+    {
+        $event = new HandlerContext();
+
+        $event->setWorkflow($context->getWorkflow());
+        $event->setTransientVars($context->getTransientVars());
+
+        return $event;
     }
 
     /**
