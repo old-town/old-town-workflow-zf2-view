@@ -6,11 +6,11 @@
 namespace OldTown\Workflow\ZF2\View\Handler;
 
 /**
- * Interface EventBusMessageProviderInterface
+ * Interface ProviderInterface
  *
  * @package OldTown\Workflow\ZF2\View\Handler
  */
-interface EventBusMessageProviderInterface
+interface ProviderInterface
 {
     /**
      * @return array

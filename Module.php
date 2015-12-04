@@ -20,7 +20,7 @@ use Zend\ModuleManager\Feature\InitProviderInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ModuleManager\Listener\ServiceListenerInterface;
 use OldTown\Workflow\ZF2\View\Handler\Manager;
-use OldTown\Workflow\ZF2\View\Handler\EventBusMessageProviderInterface;
+use OldTown\Workflow\ZF2\View\Handler\ProviderInterface;
 
 
 /**
@@ -108,7 +108,7 @@ class Module implements
         $serviceListener->addServiceManager(
             Manager::class,
             'workflow_zf2_view_handler',
-            EventBusMessageProviderInterface::class,
+            ProviderInterface::class,
             'getWorkflowViewHandlerConfig'
         );
     }
