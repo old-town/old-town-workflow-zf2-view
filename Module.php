@@ -21,7 +21,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ModuleManager\Listener\ServiceListenerInterface;
 use OldTown\Workflow\ZF2\View\Handler\Manager;
 use OldTown\Workflow\ZF2\View\Handler\ProviderInterface;
-
+use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 
 /**
  * Class Module
@@ -32,7 +32,8 @@ class Module implements
     BootstrapListenerInterface,
     ConfigProviderInterface,
     AutoloaderProviderInterface,
-    InitProviderInterface
+    InitProviderInterface,
+    DependencyIndicatorInterface
 {
 
     /**
@@ -41,6 +42,16 @@ class Module implements
      * @var string
      */
     const CONFIG_KEY = 'workflow_zf2_view';
+
+    /**
+     * @return array
+     */
+    public function getModuleDependencies()
+    {
+        return [
+            'OldTown\\Workflow\\ZF2'
+        ];
+    }
 
     /**
      * @param EventInterface $e
