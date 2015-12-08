@@ -6,7 +6,7 @@
 # Функционал модуля
 Модуль реализующий отображения результатов работы workflow.
 
-Модуль реализует обработчик [RenderWorkflowResult](./src/Listener/RenderWorkflowResult.php)  события render, которое бросается модулем [old-town/workflow-zf2-view](https://github.com/old-town/workflow-zf2).
+Модуль реализует обработчик [RenderWorkflowResult](./src/Listener/RenderWorkflowResult.php)  события render, которое бросается модулем [old-town/workflow-zf2](https://github.com/old-town/workflow-zf2).
 
 Данный обработчик делегирует фунции по отображению результатов работы workflow, соответствующемeу handler'у.
 
